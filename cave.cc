@@ -45,6 +45,17 @@ void Cave::set_tile(int x, int y, Tile t) {
   tiles_[index(x, y)] = t;
 }
 
+bool Cave::box_walkable(const Rect& r) const {
+  return walkable(r.left, r.top) &&
+    walkable(r.left, r.bottom) &&
+    walkable(r.right, r.top) &&
+    walkable(r.right, r.bottom);
+}
+
+bool Cave::walkable(double px, double py) const {
+  return !get_tile((int)(px / kTileSize), (int)(py / kTileSize)).obstructs();
+}
+
 void Cave::fill_random(float rate) {
   std::uniform_real_distribution<float> r(0, 1);
 

@@ -29,6 +29,7 @@ cc_library(
     "@libgam//:screen",
     "@libgam//:text",
     ":cave",
+    ":player",
   ],
 )
 
@@ -38,5 +39,17 @@ cc_library(
   hdrs = ["cave.h"],
   deps = [
     "@libgam//:graphics",
+    "@libgam//:rect",
+  ],
+)
+
+cc_library(
+  name = "player",
+  srcs = ["player.cc"],
+  hdrs = ["player.h"],
+  deps = [
+    "@libgam//:graphics",
+    "@libgam//:rect",
+    ":cave",
   ],
 )

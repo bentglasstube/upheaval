@@ -4,6 +4,7 @@
 #include <random>
 
 #include "graphics.h"
+#include "rect.h"
 
 class Cave {
   public:
@@ -44,6 +45,9 @@ class Cave {
     Cave(unsigned int seed);
     void draw(Graphics& graphics) const;
     void generate();
+
+    bool box_walkable(const Rect& r) const;
+    bool walkable(double px, double py) const;
 
   private:
 
