@@ -147,3 +147,9 @@ bool Cave::keep_only_biggest() {
 
   return count * 2 > kMapWidth * kMapHeight;
 }
+
+void Cave::make_exit(int y, Tile t) {
+  for (int x = 0; x < kMapWidth; ++x) {
+    if (get_tile(x, y) == Tile::Open) set_tile(x, y, t);
+  }
+}

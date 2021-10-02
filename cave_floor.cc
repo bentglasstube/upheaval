@@ -32,6 +32,7 @@ void CaveFloor::generate() {
 
   const Path en = join(x, y, Direction::South);
   entrance_ = { x, y, Config::kTileSize * (en.start + en.end) / 2, 439 };
+  cave(x, y).make_bottom_exit();
 
   visited_.clear();
 
@@ -222,6 +223,8 @@ void CaveFloor::path_to_entrance(int x, int y) {
       entrance_ = { x, y - 1, p.midpoint(), Cave::pixel_height() - Config::kTileSize - 1 };
     }
   }
+
+  cave(x, y - 1).make_bottom_exit();
 }
 
 void CaveFloor::path_to_exit(int x, int y) {
@@ -239,6 +242,8 @@ void CaveFloor::path_to_exit(int x, int y) {
       exit_ = { x, y + 1, p.midpoint(), Config::kTileSize / 2 - 1 };
     }
   }
+
+  cave(x, y + 1).make_top_exit();
 }
 
 void CaveFloor::join_unvisited_rooms() {

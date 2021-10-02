@@ -13,7 +13,7 @@ class Cave {
 
     class Tile {
       public:
-        enum Value : uint8_t { Open, Wall, OOB };
+        enum Value : uint8_t { Open, Wall, Hole, Water, Lava, ExitUp, ExitDown, OOB };
 
         constexpr Tile() : value_(Wall) {}
         constexpr Tile(Value v) : value_(v) {}
@@ -23,6 +23,8 @@ class Cave {
         bool obstructs() const {
           switch (value_) {
             case Open:
+            case ExitUp:
+            case ExitDown:
               return false;
             default:
               return true;
@@ -32,11 +34,21 @@ class Cave {
         uint64_t color() const {
           switch (value_) {
             case Open:
-              return 0x111111ff;
+              return 0x993311ff;
             case Wall:
               return 0xffffffff;
-            default:
+            case Hole:
+              return 0x000000ff;
+            case Water:
+              return 0x0000ffff;
+            case Lava:
               return 0xff0000ff;
+            case ExitUp:
+              return 0xcc6622ff;
+            case ExitDown:
+              return 0x551100ff;
+            default:
+              return 0xff00ffff;
           }
         }
 
@@ -73,5 +85,8 @@ class Cave {
     void smooth(bool fill_open);
     void fill_borders();
     bool keep_only_biggest();
+    void make_exit(int y, Tile t);
+    void make_top_exit() { make_exit(0, Tile::ExitDown); }
+    void make_bottom_exit() { make_exit(kMapHeight - 1, Tile::ExitUp); }
 
 };
