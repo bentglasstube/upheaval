@@ -29,6 +29,7 @@ cc_library(
   deps = [
     "@libgam//:screen",
     "@libgam//:text",
+    "@libgam//:util",
     ":cave_system",
     ":player",
   ],

@@ -2,7 +2,9 @@
 
 #include <cmath>
 
-CaveScreen::CaveScreen() : caves_(8675309), player_(256, 224), shuffle_timer_(60000) {
+#include "util.h"
+
+CaveScreen::CaveScreen() : caves_(Util::random_seed()), player_(256, 224), shuffle_timer_(60000) {
   move_to(caves_.floor().entrance());
 }
 
