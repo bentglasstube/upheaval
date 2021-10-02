@@ -3,6 +3,8 @@
 #include <iostream>
 #include <stack>
 
+#include "config.h"
+
 Cave::Cave(unsigned int seed) : rng_(seed) {
   generate();
 }
@@ -26,8 +28,8 @@ void Cave::draw(Graphics& graphics) const {
     for (int x = 0; x < kMapWidth; ++x) {
       const Tile t = get_tile(x, y);
       graphics.draw_rect(
-          {x * kTileSize, y * kTileSize},
-          {(x + 1) * kTileSize, (y + 1) * kTileSize},
+          {x * Config::kTileSize, y * Config::kTileSize},
+          {(x + 1) * Config::kTileSize, (y + 1) * Config::kTileSize},
           t.color(),
           true);
     }
@@ -53,7 +55,7 @@ bool Cave::box_walkable(const Rect& r) const {
 }
 
 bool Cave::walkable(double px, double py) const {
-  return !get_tile((int)(px / kTileSize), (int)(py / kTileSize)).obstructs();
+  return !get_tile((int)(px / Config::kTileSize), (int)(py / Config::kTileSize)).obstructs();
 }
 
 void Cave::fill_random(float rate) {

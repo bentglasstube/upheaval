@@ -51,9 +51,8 @@ class Cave {
 
   private:
 
-    static constexpr int kTileSize = 4;
-    static constexpr int kMapHeight = 224 / kTileSize;
-    static constexpr int kMapWidth = 256 / kTileSize;
+    static constexpr int kMapHeight = 28;
+    static constexpr int kMapWidth = 32;
 
     std::mt19937 rng_;
     std::array<Tile, kMapHeight * kMapWidth> tiles_;

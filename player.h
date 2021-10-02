@@ -41,11 +41,12 @@ class Player {
     void update(const Cave& cave, unsigned int elapsed);
     void draw(Graphics& graphics) const;
 
+    Rect draw_box() const;
     Rect collision_box() const;
 
   private:
 
-    static constexpr double kSpeed = 0.03;
+    static constexpr double kSpeed = 0.05;
 
     double x_, y_;
     Direction facing_;

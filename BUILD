@@ -11,6 +11,7 @@ cc_binary(
   srcs = ["main.cc"],
   deps = [
     "@libgam//:game",
+    ":config",
     ":screens",
   ],
 )
@@ -34,12 +35,22 @@ cc_library(
 )
 
 cc_library(
+  name = "config",
+  srcs = ["config.cc"],
+  hdrs = ["config.h"],
+  deps = [
+    "@libgam//:game",
+  ],
+)
+
+cc_library(
   name = "cave",
   srcs = ["cave.cc"],
   hdrs = ["cave.h"],
   deps = [
     "@libgam//:graphics",
     "@libgam//:rect",
+    ":config",
   ],
 )
 
@@ -51,5 +62,6 @@ cc_library(
     "@libgam//:graphics",
     "@libgam//:rect",
     ":cave",
+    ":config",
   ],
 )

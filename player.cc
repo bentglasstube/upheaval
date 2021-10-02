@@ -1,5 +1,7 @@
 #include "player.h"
 
+#include "config.h"
+
 Player::Player(int x, int y) :
   x_(x), y_(y),
   facing_(Direction::North),
@@ -40,12 +42,15 @@ void Player::update(const Cave& cave, unsigned int elapsed) {
 }
 
 void Player::draw(Graphics& graphics) const {
-  const Rect r = collision_box();
-  graphics.draw_rect({(int)r.left, (int)r.top}, {(int)r.right + 1, (int)r.bottom + 1}, 0xd8ff00ff, true);
+  draw_box().draw(graphics, 0, 0, 0xd8ff00ff, true);
+}
+
+Rect Player::draw_box() const {
+  return { x_ - Config::kTileSize / 2, y_ - Config::kTileSize / 2, x_ + Config::kTileSize / 2, y_ + Config::kTileSize / 2 };
 }
 
 Rect Player::collision_box() const {
-  return { x_ - 2, y_ - 2, x_ + 1, y_ + 1 };
+  return { x_ - Config::kTileSize / 2, y_, x_ + Config::kTileSize / 2, y_ + Config::kTileSize / 2 };
 }
 
 bool Player::move_if_possible(const Cave& cave, double dx, double dy) {
