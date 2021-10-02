@@ -31,18 +31,20 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
 
   const int height = Cave::pixel_height();
   const int width = Cave::pixel_width();
+  const int ht = Config::kTileSize / 2;
+
   if (p.left < 1) {
     --fx_;
-    player_.set_position(width - Config::kTileSize - 1, player_.y());
+    player_.set_position(width - ht - 1, player_.y());
   } else if (p.right > width - 1) {
     ++fx_;
-    player_.set_position(Config::kTileSize + 1, player_.y());
+    player_.set_position(ht + 1, player_.y());
   } else if (p.top < 1) {
     --fy_;
-    player_.set_position(player_.x(), height - Config::kTileSize - 1);
+    player_.set_position(player_.x(), height - ht - 1);
   } else if (p.bottom > height - 1) {
     ++fy_;
-    player_.set_position(player_.x(), Config::kTileSize / 2 - 1);
+    player_.set_position(player_.x(), ht - 1);
   }
 
   if (fy_ < 0) {
