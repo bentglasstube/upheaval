@@ -15,7 +15,7 @@ void CaveFloor::draw(Graphics& graphics) const {
           const Cave::Tile t = cave.get_tile(x, y);
           const int dx = 4 * (cx * Cave::kMapWidth + x);
           const int dy = 4 * (cy * Cave::kMapHeight + y);
-          graphics.draw_rect({dx, dy}, {dx + 3, dy + 3}, t.color(), true);
+          graphics.draw_rect({dx, dy}, {dx + 4, dy + 4}, t.color(), true);
         }
       }
     }

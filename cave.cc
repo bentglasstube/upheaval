@@ -17,6 +17,9 @@ void Cave::generate(unsigned long seed) {
     if (keep_only_biggest()) break;
   }
 
+  for (int i = 0; i < 5; ++i) add_hole();
+  add_spice(Tile::Water);
+
   // do more stuff
 }
 
@@ -113,18 +116,88 @@ bool Cave::keep_only_biggest() {
     if (get_tile(x, y) == Tile::OOB) return false;
   }
 
+  const int count = flood_fill(x, y, Tile::Open, Tile::Keep);
+  if (count * 2 < kMapWidth * kMapHeight) return false;
+
+  for (int fy = 0; fy < kMapHeight; ++fy) {
+    for (int fx = 0; fx < kMapWidth; ++fx) {
+      const Tile t = get_tile(fx, fy);
+      if (t == Tile::Keep) {
+        set_tile(fx, fy, Tile::Open);
+      } else if (t == Tile::Open) {
+        set_tile(fx, fy, Tile::Wall);
+      }
+    }
+  }
+
+  return true;
+}
+
+void Cave::make_exit(int y, Tile t) {
+  for (int x = 0; x < kMapWidth; ++x) {
+    if (get_tile(x, y) == Tile::Open) set_tile(x, y, t);
+  }
+}
+
+void Cave::add_spice(Tile t) {
+  std::uniform_int_distribution<int> rx(2, kMapWidth - 3);
+  std::uniform_int_distribution<int> ry(2, kMapHeight - 3);
+
+  int tries = 20;
+  while (--tries > 0) {
+    int x = rx(rng_);
+    int y = ry(rng_);
+
+    if (get_tile(x, y) == Tile::Wall) {
+      flood_fill(x, y, Tile::Wall, t);
+      bool undo = false;
+      for (int ex = 0; ex < kMapWidth; ++ex) {
+        if (get_tile(ex, 0) == t || get_tile(ex, kMapHeight - 1) == t) undo = true;
+      }
+      for (int ey = 0; ey < kMapHeight; ++ey) {
+        if (get_tile(0, ey) == t || get_tile(kMapWidth - 1, ey) == t) undo = true;
+      }
+
+      if (undo) {
+        flood_fill(x, y, t, Tile::Wall);
+      } else {
+        return;
+      }
+    }
+  }
+}
+
+void Cave::add_hole() {
+  std::uniform_int_distribution<int> rx(2, kMapWidth - 3);
+  std::uniform_int_distribution<int> ry(2, kMapHeight - 3);
+
+  int tries = 50;
+  while (--tries > 0) {
+    int x = rx(rng_);
+    int y = ry(rng_);
+
+    if (get_tile(x, y) == Tile::Wall) {
+      const int count = flood_fill(x, y, Tile::Wall, Tile::Hole);
+      if (count > 7) flood_fill(x, y, Tile::Hole, Tile::Wall);
+    }
+  }
+}
+
+int Cave::flood_fill(int x, int y, Tile from, Tile to) {
+  int count = 0;
   std::stack<int> stack;
   stack.push(index(x, y));
-  while (!stack.empty()) {
 
+  while (!stack.empty()) {
     const int p = stack.top();
     stack.pop();
 
     const int px = p % kMapWidth;
     const int py = p / kMapWidth;
 
-    if (get_tile(px, py) == Tile::Open) {
-      set_tile(px, py, Tile::OOB);
+    if (get_tile(px, py) == from) {
+      ++count;
+      set_tile(px, py, to);
       stack.push(index(px + 1, py));
       stack.push(index(px - 1, py));
       stack.push(index(px, py + 1));
@@ -132,24 +205,5 @@ bool Cave::keep_only_biggest() {
     }
   }
 
-  int count = 0;
-  for (int fy = 0; fy < kMapHeight; ++fy) {
-    for (int fx = 0; fx < kMapWidth; ++fx) {
-      const Tile t = get_tile(fx, fy);
-      if (t == Tile::OOB) {
-        set_tile(fx, fy, Tile::Open);
-        ++count;
-      } else if (t == Tile::Open) {
-        set_tile(fx, fy, Tile::Wall);
-      }
-    }
-  }
-
-  return count * 2 > kMapWidth * kMapHeight;
-}
-
-void Cave::make_exit(int y, Tile t) {
-  for (int x = 0; x < kMapWidth; ++x) {
-    if (get_tile(x, y) == Tile::Open) set_tile(x, y, t);
-  }
+  return count;
 }

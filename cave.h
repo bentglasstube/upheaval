@@ -13,7 +13,7 @@ class Cave {
 
     class Tile {
       public:
-        enum Value : uint8_t { Open, Wall, Hole, Water, Lava, ExitUp, ExitDown, OOB };
+        enum Value : uint8_t { Open, Wall, Hole, Water, Lava, ExitUp, ExitDown, OOB, Keep };
 
         constexpr Tile() : value_(Wall) {}
         constexpr Tile(Value v) : value_(v) {}
@@ -36,7 +36,7 @@ class Cave {
             case Open:
               return 0x993311ff;
             case Wall:
-              return 0xffffffff;
+              return 0xaaaaaaff;
             case Hole:
               return 0x000000ff;
             case Water:
@@ -88,5 +88,8 @@ class Cave {
     void make_exit(int y, Tile t);
     void make_top_exit() { make_exit(0, Tile::ExitDown); }
     void make_bottom_exit() { make_exit(kMapHeight - 1, Tile::ExitUp); }
+    void add_spice(Tile t);
+    void add_hole();
 
+    int flood_fill(int x, int y, Tile from, Tile to);
 };

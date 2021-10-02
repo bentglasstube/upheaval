@@ -72,7 +72,7 @@ void CaveScreen::draw(Graphics& graphics) const {
   /* caves_.draw(graphics); */
   /* int px = 4 * (fx_ * Cave::kMapWidth + player_.x() / Config::kTileSize); */
   /* int py = 4 * (fy_ * Cave::kMapHeight + player_.y() / Config::kTileSize); */
-  /* graphics.draw_rect({px, py}, {px + 3, py + 3}, 0xd8ff00ff, true); */
+  /* graphics.draw_rect({px, py}, {px + 4, py + 4}, 0xd8ff00ff, true); */
 }
 
 void CaveScreen::move_to(const CaveFloor::Position& p) {
