@@ -20,7 +20,7 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
   }
 
   if (input.key_pressed(Input::Button::A)) {
-    shuffle_timer_ = 3000;
+    player_.interact(caves_.floor().cave(fx_, fy_));
   }
 
   player_.update(caves_.floor().cave(fx_, fy_), elapsed);
@@ -54,7 +54,10 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
     move_to(caves_.floor().entrance());
   } else if (fy_ > 3) {
     if (caves_.depth() == 0) {
-      // TODO check win condition
+      if (player_.has_amulet()) {
+        // TODO win screen?
+        return false;
+      }
       player_.set_position(player_.x(), height - ht - 1);
       fy_ = 3;
     } else {
@@ -65,7 +68,6 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
 
   shuffle_timer_ -= elapsed;
   if (shuffle_timer_ < 0) {
-    // TODO earthquake effect
     caves_.floor().shuffle_rooms(fx_, fy_);
     shuffle_timer_ = 60000;
   }

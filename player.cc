@@ -1,11 +1,14 @@
 #include "player.h"
 
+#include <cmath>
+
 #include "config.h"
 
 Player::Player(int x, int y) :
   x_(x), y_(y),
   facing_(Direction::North),
-  state_(State::Waiting) {}
+  state_(State::Waiting),
+  has_amulet_(false) {}
 
 void Player::move(Direction dir) {
   state_ = State::Walking;
@@ -82,4 +85,22 @@ bool Player::move_if_possible(const Cave& cave, double dx, double dy) {
 
 bool Player::collision(const Cave& cave) const {
   return !cave.box_walkable(collision_box());
+}
+
+void Player::interact(Cave& cave) {
+  int px = std::floor(x_ / Config::kTileSize);
+  int py = std::floor(y_ / Config::kTileSize);
+
+  switch (facing_) {
+    case Direction::North: --py; break;
+    case Direction::East:  ++px; break;
+    case Direction::South: ++py; break;
+    case Direction::West:  --px; break;
+  }
+
+  if (cave.get_tile(px, py) == Cave::Tile::Amulet) {
+    cave.take_amulet(px, py);
+    has_amulet_ = true;
+  }
+
 }

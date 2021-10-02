@@ -230,16 +230,23 @@ void CaveFloor::path_to_entrance(int x, int y) {
 void CaveFloor::path_to_exit(int x, int y) {
   std::uniform_int_distribution<int> picker(0, 4);
   while (y >= 0) {
-    const int dir = get_path(x, y, Direction::North) ? 4 : picker(rng_);
     visited_.insert(y * 4 + x);
+
+    if (cave(x, y).has_treasure()) return;
+    const int dir = get_path(x, y, Direction::North) ? 4 : picker(rng_);
 
     if (dir < 2) {
       if (x > 0) join(x--, y, Direction::West, true);
     } else if (dir < 4) {
       if (x < 3) join(x++, y, Direction::East, true);
     } else {
-      const Path p = join(x, y--, Direction::North, true);
-      exit_ = { x, y + 1, p.midpoint(), Config::kTileSize / 2 - 1 };
+      if (y == 0 && floor_ == kLastFloor) {
+        cave(x, y).add_treasure();
+      } else {
+        const Path p = join(x, y, Direction::North, true);
+        exit_ = { x, y, p.midpoint(), Config::kTileSize / 2 - 1 };
+      }
+      --y;
     }
   }
 

@@ -298,3 +298,31 @@ void Cave::ShadowLine::add(const Shadow& shadow) {
   }
 }
 
+void Cave::add_treasure() {
+  std::uniform_int_distribution<int> rx(2, kMapWidth - 3);
+  std::uniform_int_distribution<int> ry(2, kMapHeight - 3);
+
+  while (true) {
+    int x = rx(rng_);
+    int y = ry(rng_);
+
+    if (get_tile(x, y) == Tile::Open) {
+      set_tile(x, y, Tile::Amulet);
+      return;
+    }
+  }
+}
+
+bool Cave::has_treasure() const {
+  for (const auto& c : cells_) {
+    if (c.tile == Tile::Amulet) return true;
+    if (c.tile == Tile::ExAmulet) return true;
+  }
+  return false;
+}
+
+void Cave::take_amulet(int x, int y) {
+  if (get_tile(x, y) == Tile::Amulet) {
+    set_tile(x, y, Tile::ExAmulet);
+  }
+}

@@ -30,6 +30,8 @@ class CaveFloor {
 
   private:
 
+    static constexpr int kLastFloor = 1;
+
     std::mt19937 rng_;
     int floor_;
     std::array<Cave, 16> caves_;

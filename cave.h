@@ -13,7 +13,7 @@ class Cave {
 
     class Tile {
       public:
-        enum Value : uint8_t { Open, Wall, Hole, Water, Lava, ExitUp, ExitDown, OOB, Keep };
+        enum Value : uint8_t { Open, Wall, Hole, Water, Lava, ExitUp, ExitDown, OOB, Keep, Amulet, ExAmulet };
 
         constexpr Tile() : value_(Wall) {}
         constexpr Tile(Value v) : value_(v) {}
@@ -25,6 +25,7 @@ class Cave {
             case Open:
             case ExitUp:
             case ExitDown:
+            case ExAmulet:
               return false;
             default:
               return true;
@@ -44,6 +45,7 @@ class Cave {
         uint64_t color() const {
           switch (value_) {
             case Open:
+            case ExAmulet:
               return 0x993311ff;
             case Wall:
               return 0xaaaaaaff;
@@ -57,6 +59,8 @@ class Cave {
               return 0xcc6622ff;
             case ExitDown:
               return 0x551100ff;
+            case Amulet:
+              return 0x9911ffff;
             default:
               return 0xff00ffff;
           }
@@ -79,6 +83,8 @@ class Cave {
     bool walkable(double px, double py) const;
 
     void calculate_visibility(int x, int y, int max);
+    Tile get_tile(int x, int y) const;
+    void take_amulet(int x, int y);
 
     friend class CaveFloor;
 
@@ -109,7 +115,6 @@ class Cave {
     };
 
     int index(int x, int y) const { return y * kMapWidth + x; }
-    Tile get_tile(int x, int y) const;
     void set_tile(int x, int y, Tile t);
     void set_visible(int x, int y, bool visible);
     int walls_near(int x, int y, int r) const;
@@ -123,6 +128,8 @@ class Cave {
     void make_bottom_exit() { make_exit(kMapHeight - 1, Tile::ExitUp); }
     void add_spice(Tile t);
     void add_hole();
+    void add_treasure();
+    bool has_treasure() const;
 
     int flood_fill(int x, int y, Tile from, Tile to);
 };
