@@ -1,0 +1,9 @@
+[Desktop Entry]
+
+Type=Application
+Version=1.0
+Name=ld49
+Terminal=false
+Icon=icon
+Exec=ld49
+Categories=Game;
