@@ -56,10 +56,10 @@ class Cave {
     static constexpr int pixel_width() { return kMapWidth * Config::kTileSize; }
     static constexpr int pixel_height() { return kMapHeight * Config::kTileSize; }
 
-  private:
-
     static constexpr int kMapHeight = 28;
     static constexpr int kMapWidth = 32;
+
+  private:
 
     std::mt19937 rng_;
     std::array<Tile, kMapHeight * kMapWidth> tiles_;

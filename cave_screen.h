@@ -19,7 +19,7 @@ class CaveScreen : public Screen {
 
     CaveFloor caves_;
     Player player_;
-    int timer_;
+    int shuffle_timer_;
     int fx_, fy_;
 
 };

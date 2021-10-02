@@ -27,39 +27,15 @@ void CaveFloor::generate() {
     caves_[i].generate(rng_());
   }
 
-  int x = sx_ = std::uniform_int_distribution<int>(0, 3)(rng_);
-  int y = sy_ = 3;
+  sx_ = std::uniform_int_distribution<int>(0, 3)(rng_);
+  sy_ = 3;
 
-  join(x, y, Direction::South);
+  join(sx_, sy_, Direction::South);
+  visited_.clear();
 
-  std::unordered_set<int> caves_seen;
-
-  std::uniform_int_distribution<int> picker(0, 4);
-  while (y >= 0) {
-    const int dir = picker(rng_);
-    caves_seen.insert(y * 4 + x);
-
-    if (dir < 2) {
-      if (x > 0) join(x--, y, Direction::West);
-    } else if (dir < 4) {
-      if (x < 3) join(x++, y, Direction::East);
-    } else {
-      join(x, y--, Direction::North);
-    }
-  }
-
-  for (int i = 0; i < 16; ++i) {
-    if (caves_seen.count(i) == 0) {
-      const int ix = i % 4;
-      const int iy = i / 4;
-      random_join(ix, iy);
-    }
-  }
-
-  std::uniform_int_distribution<int> coord_picker(0, 3);
-  for (int i = 0; i < 5; ++i) {
-    random_join(coord_picker(rng_), coord_picker(rng_));
-  }
+  path_to_exit(sx_, sy_);
+  join_unvisited_rooms();
+  join_random_rooms(5);
 }
 
 Cave& CaveFloor::cave(int x, int y) {
@@ -82,7 +58,7 @@ CaveFloor::Path CaveFloor::pick_path(int x, int y, Direction d) {
   if (d == Direction::North || d == Direction::South) {
     int iy = d == Direction::North ? 3 : Cave::kMapHeight - 4;
     while (min >= max) {
-      for (int ix = 0; ix < Cave::kMapWidth; ++ix) {
+      for (int ix = 2; ix < Cave::kMapWidth - 2; ++ix) {
         if (cave.get_tile(ix, iy) == Cave::Tile::Open) {
           if (ix < min) min = ix;
           if (ix > max) max = ix;
@@ -98,7 +74,7 @@ CaveFloor::Path CaveFloor::pick_path(int x, int y, Direction d) {
   } else {
     int ix = d == Direction::West ? 3 : Cave::kMapWidth - 4;
     while (min >= max) {
-      for (int iy = 0; iy < Cave::kMapHeight; ++iy) {
+      for (int iy = 2; iy < Cave::kMapHeight - 2; ++iy) {
         if (cave.get_tile(ix, iy) == Cave::Tile::Open) {
           if (iy < min) min = iy;
           if (iy > max) max = iy;
@@ -111,6 +87,32 @@ CaveFloor::Path CaveFloor::pick_path(int x, int y, Direction d) {
     const int width = std::uniform_int_distribution<int>(1, max_width)(rng_);
     const int start = std::uniform_int_distribution<int>(min, max - width)(rng_);
     return { start, start + width };
+  }
+}
+
+CaveFloor::Path CaveFloor::get_path(int x, int y, Direction d) {
+  const Cave& cave = caves_[y * 4 + x];
+  int min = 99;
+  int max = -1;
+
+  if (d == Direction::North || d == Direction::South) {
+    int iy = d == Direction::North ? 0 : Cave::kMapHeight - 1;
+    for (int ix = 0; ix < Cave::kMapWidth; ++ix) {
+      if (cave.get_tile(ix, iy) == Cave::Tile::Open) {
+        if (ix < min) min = ix;
+        if (ix > max) max = ix;
+      }
+    }
+    return { min, max };
+  } else {
+    int ix = d == Direction::West ? 0 : Cave::kMapWidth - 1;
+    for (int iy = 0; iy < Cave::kMapHeight; ++iy) {
+      if (cave.get_tile(ix, iy) == Cave::Tile::Open) {
+        if (iy < min) min = iy;
+        if (iy > max) max = iy;
+      }
+    }
+    return { min, max };
   }
 }
 
@@ -137,7 +139,9 @@ void CaveFloor::make_path(int x, int y, Direction d, Path p) {
   }
 }
 
-void CaveFloor::join(int x, int y, Direction d) {
+void CaveFloor::join(int x, int y, Direction d, bool prefer_existing) {
+  if (prefer_existing && join_existing(x, y, d)) return;
+
   const Path p = pick_path(x, y, d);
   make_path(x, y, d, p);
   switch (d) {
@@ -175,4 +179,86 @@ void CaveFloor::random_join(int x, int y) {
       }
     }
   }
+}
+
+void CaveFloor::shuffle_rooms(int keep_x, int keep_y) {
+  for (size_t i = 0; i < caves_.size(); ++i) {
+    int ix = i % 4;
+    int iy = i / 4;
+    if (ix != keep_x || iy != keep_y) caves_[i].generate(rng_());
+  }
+
+  join_existing(keep_x, keep_y, Direction::North);
+  join_existing(keep_x, keep_y, Direction::East);
+  join_existing(keep_x, keep_y, Direction::South);
+  join_existing(keep_x, keep_y, Direction::West);
+
+  visited_.clear();
+  path_to_entrance(keep_x, keep_y);
+  path_to_exit(keep_x, keep_y);
+
+  join_unvisited_rooms();
+  join_random_rooms(5);
+}
+
+void CaveFloor::path_to_entrance(int x, int y) {
+  std::uniform_int_distribution<int> picker(0, 4);
+  while (y <= 3) {
+    const int dir = get_path(x, y, Direction::South) ? 4 : picker(rng_);
+    visited_.insert(y * 4 + x);
+
+    if (dir < 2) {
+      if (x > 0) join(x--, y, Direction::West, true);
+    } else if (dir < 4) {
+      if (x < 3) join(x++, y, Direction::East, true);
+    } else {
+      join(x, y++, Direction::South, true);
+    }
+  }
+}
+
+void CaveFloor::path_to_exit(int x, int y) {
+  std::uniform_int_distribution<int> picker(0, 4);
+  while (y >= 0) {
+    const int dir = get_path(x, y, Direction::North) ? 4 : picker(rng_);
+    visited_.insert(y * 4 + x);
+
+    if (dir < 2) {
+      if (x > 0) join(x--, y, Direction::West, true);
+    } else if (dir < 4) {
+      if (x < 3) join(x++, y, Direction::East, true);
+    } else {
+      join(x, y--, Direction::North, true);
+    }
+  }
+}
+
+void CaveFloor::join_unvisited_rooms() {
+  for (size_t i = 0; i < caves_.size(); ++i) {
+    if (visited_.count(i) == 0) {
+      random_join(i % 4, i / 4);
+    }
+  }
+}
+
+void CaveFloor::join_random_rooms(int count) {
+  std::uniform_int_distribution<int> coord_picker(0, 3);
+  for (int i = 0; i < count; ++i) {
+    random_join(coord_picker(rng_), coord_picker(rng_));
+  }
+}
+
+bool CaveFloor::join_existing(int x, int y, Direction d) {
+  const Path p = get_path(x, y, d);
+  if (p) {
+    switch (d) {
+      case Direction::North: --y; break;
+      case Direction::South: ++y; break;
+      case Direction::West:  --x; break;
+      case Direction::East:  ++x; break;
+    }
+    make_path(x, y, d.reverse(), p);
+  }
+
+  return p;
 }

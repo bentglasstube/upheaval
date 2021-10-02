@@ -1,9 +1,11 @@
 #include "cave_screen.h"
 
-CaveScreen::CaveScreen() : caves_(8675309), player_(128, 112), timer_(250) {
+CaveScreen::CaveScreen() : caves_(8675309), player_(256, 224), shuffle_timer_(60000) {
   caves_.generate();
   fx_ = caves_.startx();
   fy_ = caves_.starty();
+
+  // TODO set player to start position
 }
 
 bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
@@ -47,7 +49,22 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
     player_.set_position(player_.x(), Config::kTileSize / 2 - 1);
   }
 
-  // TODO handle entrance and exit
+  if (fy_ < 0) {
+    caves_.generate();
+    fx_ = caves_.startx();
+    fy_ = caves_.starty();
+  } else if (fy_ > 3) {
+    caves_.generate();
+    fx_ = caves_.startx();
+    fy_ = caves_.starty();
+  }
+
+  shuffle_timer_ -= elapsed;
+  if (shuffle_timer_ < 0) {
+    // TODO earthquake effect
+    caves_.shuffle_rooms(fx_, fy_);
+    shuffle_timer_ = 60000;
+  }
 
   return true;
 }
@@ -55,4 +72,9 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
 void CaveScreen::draw(Graphics& graphics) const {
   caves_.cave(fx_, fy_).draw(graphics);
   player_.draw(graphics);
+
+  /* caves_.draw(graphics); */
+  /* int px = 4 * (fx_ * Cave::kMapWidth + player_.x() / Config::kTileSize); */
+  /* int py = 4 * (fy_ * Cave::kMapHeight + player_.y() / Config::kTileSize); */
+  /* graphics.draw_rect({px, py}, {px + 3, py + 3}, 0xd8ff00ff, true); */
 }
