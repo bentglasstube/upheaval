@@ -23,8 +23,7 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
     shuffle_timer_ = 3000;
   }
 
-  Cave& current = caves_.floor().cave(fx_, fy_);
-  player_.update(current, elapsed);
+  player_.update(caves_.floor().cave(fx_, fy_), elapsed);
 
   const Rect p = player_.collision_box();
 
@@ -54,16 +53,16 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
     move_to(caves_.floor().exit());
   }
 
-  const int px = std::floor(player_.x() / Config::kTileSize);
-  const int py = std::floor(player_.y() / Config::kTileSize);
-  current.calculate_visibility(px, py, 10);
-
   shuffle_timer_ -= elapsed;
   if (shuffle_timer_ < 0) {
     // TODO earthquake effect
     caves_.floor().shuffle_rooms(fx_, fy_);
     shuffle_timer_ = 60000;
   }
+
+  const int px = std::floor(player_.x() / Config::kTileSize);
+  const int py = std::floor(player_.y() / Config::kTileSize);
+  caves_.floor().cave(fx_, fy_).calculate_visibility(px, py, 10);
 
   return true;
 }
