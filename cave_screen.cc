@@ -74,7 +74,8 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
 
   const int px = std::floor(player_.x() / Config::kTileSize);
   const int py = std::floor(player_.y() / Config::kTileSize);
-  caves_.floor().cave(fx_, fy_).calculate_visibility(px, py, 10);
+  const int visibility = 11 - 2 * caves_.depth() + (player_.has_amulet() ? 6 : 0);
+  caves_.floor().cave(fx_, fy_).calculate_visibility(px, py, visibility);
 
   return true;
 }
