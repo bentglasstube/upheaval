@@ -30,7 +30,7 @@ class CaveFloor {
 
   private:
 
-    static constexpr int kLastFloor = 1;
+    static constexpr int kLastFloor = 4;
 
     std::mt19937 rng_;
     int floor_;
