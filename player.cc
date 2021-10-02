@@ -53,6 +53,12 @@ Rect Player::collision_box() const {
   return { x_ - Config::kTileSize / 2, y_, x_ + Config::kTileSize / 2, y_ + Config::kTileSize / 2 };
 }
 
+void Player::set_position(int x, int y) {
+  x_ = x;
+  y_ = y;
+  stop();
+}
+
 bool Player::move_if_possible(const Cave& cave, double dx, double dy) {
   x_ += dx;
   y_ += dy;

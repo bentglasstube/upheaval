@@ -22,9 +22,13 @@ class Player {
     Rect draw_box() const;
     Rect collision_box() const;
 
+    double x() const { return x_; }
+    double y() const { return y_; }
+    void set_position(int x, int y);
+
   private:
 
-    static constexpr double kSpeed = 0.05;
+    static constexpr double kSpeed = 0.075;
 
     double x_, y_;
     Direction facing_;

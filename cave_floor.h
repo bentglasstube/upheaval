@@ -18,10 +18,14 @@ class CaveFloor {
     Cave& cave(int x, int y);
     const Cave& cave(int x, int y) const;
 
+    int startx() const { return sx_; }
+    int starty() const { return sy_; }
+
   private:
 
     std::mt19937 rng_;
     std::array<Cave, 16> caves_;
+    int sx_, sy_;
 
     struct Path { int start, end; };
 

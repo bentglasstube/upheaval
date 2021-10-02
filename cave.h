@@ -6,6 +6,8 @@
 #include "graphics.h"
 #include "rect.h"
 
+#include "config.h"
+
 class Cave {
   public:
 
@@ -34,7 +36,7 @@ class Cave {
             case Wall:
               return 0xffffffff;
             default:
-              return 0xd8ff00ff;
+              return 0xff0000ff;
           }
         }
 
@@ -50,6 +52,9 @@ class Cave {
     bool walkable(double px, double py) const;
 
     friend class CaveFloor;
+
+    static constexpr int pixel_width() { return kMapWidth * Config::kTileSize; }
+    static constexpr int pixel_height() { return kMapHeight * Config::kTileSize; }
 
   private:
 

@@ -1,9 +1,8 @@
 #include "cave.h"
 
 #include <cassert>
+#include <cmath>
 #include <stack>
-
-#include "config.h"
 
 Cave::Cave() {}
 
@@ -56,7 +55,9 @@ bool Cave::box_walkable(const Rect& r) const {
 }
 
 bool Cave::walkable(double px, double py) const {
-  return !get_tile((int)(px / Config::kTileSize), (int)(py / Config::kTileSize)).obstructs();
+  const int x = std::floor(px / Config::kTileSize);
+  const int y = std::floor(py / Config::kTileSize);
+  return !get_tile(x, y).obstructs();
 }
 
 void Cave::fill_random(float rate) {

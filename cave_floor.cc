@@ -3,9 +3,7 @@
 #include <cassert>
 #include <unordered_set>
 
-CaveFloor::CaveFloor(unsigned long seed) : rng_(seed) {
-  generate();
-}
+CaveFloor::CaveFloor(unsigned long seed) : rng_(seed) {}
 
 void CaveFloor::draw(Graphics& graphics) const {
   for (int cy = 0; cy < 4; ++cy) {
@@ -29,8 +27,8 @@ void CaveFloor::generate() {
     caves_[i].generate(rng_());
   }
 
-  int x = std::uniform_int_distribution<int>(0, 3)(rng_);
-  int y = 3;
+  int x = sx_ = std::uniform_int_distribution<int>(0, 3)(rng_);
+  int y = sy_ = 3;
 
   join(x, y, Direction::South);
 
