@@ -42,12 +42,14 @@ class Cave {
         Value value_;
     };
 
-    Cave(unsigned int seed);
+    Cave();
     void draw(Graphics& graphics) const;
-    void generate();
+    void generate(unsigned long seed);
 
     bool box_walkable(const Rect& r) const;
     bool walkable(double px, double py) const;
+
+    friend class CaveFloor;
 
   private:
 

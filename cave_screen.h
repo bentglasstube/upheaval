@@ -2,7 +2,7 @@
 
 #include "screen.h"
 
-#include "cave.h"
+#include "cave_floor.h"
 #include "player.h"
 
 class CaveScreen : public Screen {
@@ -17,7 +17,7 @@ class CaveScreen : public Screen {
 
   private:
 
-    Cave cave_;
+    CaveFloor caves_;
     Player player_;
     int timer_;
 

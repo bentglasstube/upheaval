@@ -1,23 +1,21 @@
 #include "cave.h"
 
-#include <iostream>
+#include <cassert>
 #include <stack>
 
 #include "config.h"
 
-Cave::Cave(unsigned int seed) : rng_(seed) {
-  generate();
-}
+Cave::Cave() {}
 
-void Cave::generate() {
+void Cave::generate(unsigned long seed) {
+  rng_.seed(seed);
+
   while (true) {
     fill_random(0.45);
     for (int i = 0; i < 5; ++i) smooth(true);
     for (int i = 0; i < 2; ++i) smooth(false);
     fill_borders();
-    if (keep_only_biggest()) {
-      break;
-    }
+    if (keep_only_biggest()) break;
   }
 
   // do more stuff
@@ -38,12 +36,15 @@ void Cave::draw(Graphics& graphics) const {
 
 Cave::Tile Cave::get_tile(int x, int y) const {
   if (x < 0 || x >= kMapWidth) return Tile::OOB;
-  if (y < 0 || y >= kMapWidth) return Tile::OOB;
+  if (y < 0 || y >= kMapHeight) return Tile::OOB;
 
   return tiles_[index(x, y)];
 }
 
 void Cave::set_tile(int x, int y, Tile t) {
+  assert(x >= 0 && x < kMapWidth);
+  assert(y >= 0 && y < kMapHeight);
+
   tiles_[index(x, y)] = t;
 }
 
