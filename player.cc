@@ -46,11 +46,19 @@ void Player::draw(Graphics& graphics) const {
 }
 
 Rect Player::draw_box() const {
-  return { x_ - Config::kTileSize / 2, y_ - Config::kTileSize / 2, x_ + Config::kTileSize / 2, y_ + Config::kTileSize / 2 };
+  return {
+    x_ - Config::kTileSize / 2,
+    y_ - Config::kTileSize / 2,
+    x_ + Config::kTileSize / 2,
+    y_ + Config::kTileSize / 2 };
 }
 
 Rect Player::collision_box() const {
-  return { x_ - Config::kTileSize / 2, y_, x_ + Config::kTileSize / 2, y_ + Config::kTileSize / 2 };
+  return {
+    x_ - Config::kTileSize / 2 + 1,
+    y_,
+    x_ + Config::kTileSize / 2 - 1,
+    y_ + Config::kTileSize / 2 - 1 };
 }
 
 void Player::set_position(int x, int y) {
