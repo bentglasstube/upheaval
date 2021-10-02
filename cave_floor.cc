@@ -101,7 +101,7 @@ CaveFloor::Path CaveFloor::get_path(int x, int y, Direction d) {
   if (d == Direction::North || d == Direction::South) {
     int iy = d == Direction::North ? 0 : Cave::kMapHeight - 1;
     for (int ix = 0; ix < Cave::kMapWidth; ++ix) {
-      if (cave.get_tile(ix, iy) == Cave::Tile::Open) {
+      if (!cave.get_tile(ix, iy).obstructs()) {
         if (ix < min) min = ix;
         if (ix > max) max = ix;
       }
@@ -110,7 +110,7 @@ CaveFloor::Path CaveFloor::get_path(int x, int y, Direction d) {
   } else {
     int ix = d == Direction::West ? 0 : Cave::kMapWidth - 1;
     for (int iy = 0; iy < Cave::kMapHeight; ++iy) {
-      if (cave.get_tile(ix, iy) == Cave::Tile::Open) {
+      if (!cave.get_tile(ix, iy).obstructs()) {
         if (iy < min) min = iy;
         if (iy > max) max = iy;
       }
@@ -219,8 +219,9 @@ void CaveFloor::path_to_entrance(int x, int y) {
     } else if (dir < 4) {
       if (x < 3) join(x++, y, Direction::East, true);
     } else {
-      const Path p = join(x, y++, Direction::South, true);
-      entrance_ = { x, y - 1, p.midpoint(), Cave::pixel_height() - Config::kTileSize - 1 };
+      const Path p = join(x, y, Direction::South, true);
+      entrance_ = { x, y, p.midpoint(), Cave::pixel_height() - Config::kTileSize - 1 };
+      ++y;
     }
   }
 
