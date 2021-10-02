@@ -27,13 +27,15 @@ void CaveFloor::generate() {
     caves_[i].generate(rng_());
   }
 
-  sx_ = std::uniform_int_distribution<int>(0, 3)(rng_);
-  sy_ = 3;
+  int x = std::uniform_int_distribution<int>(0, 3)(rng_);
+  int y = 3;
 
-  join(sx_, sy_, Direction::South);
+  const Path en = join(x, y, Direction::South);
+  entrance_ = { x, y, Config::kTileSize * (en.start + en.end) / 2, 439 };
+
   visited_.clear();
 
-  path_to_exit(sx_, sy_);
+  path_to_exit(x, y);
   join_unvisited_rooms();
   join_random_rooms(5);
 }
@@ -139,8 +141,11 @@ void CaveFloor::make_path(int x, int y, Direction d, Path p) {
   }
 }
 
-void CaveFloor::join(int x, int y, Direction d, bool prefer_existing) {
-  if (prefer_existing && join_existing(x, y, d)) return;
+CaveFloor::Path CaveFloor::join(int x, int y, Direction d, bool prefer_existing) {
+  if (prefer_existing) {
+    const Path ep = join_existing(x, y, d);
+    if (ep) return ep;
+  }
 
   const Path p = pick_path(x, y, d);
   make_path(x, y, d, p);
@@ -151,6 +156,7 @@ void CaveFloor::join(int x, int y, Direction d, bool prefer_existing) {
     case Direction::East:  ++x; break;
   }
   make_path(x, y, d.reverse(), p);
+  return p;
 }
 
 void CaveFloor::random_join(int x, int y) {
@@ -212,7 +218,8 @@ void CaveFloor::path_to_entrance(int x, int y) {
     } else if (dir < 4) {
       if (x < 3) join(x++, y, Direction::East, true);
     } else {
-      join(x, y++, Direction::South, true);
+      const Path p = join(x, y++, Direction::South, true);
+      entrance_ = { x, y - 1, p.midpoint(), Cave::pixel_height() - Config::kTileSize - 1 };
     }
   }
 }
@@ -228,7 +235,8 @@ void CaveFloor::path_to_exit(int x, int y) {
     } else if (dir < 4) {
       if (x < 3) join(x++, y, Direction::East, true);
     } else {
-      join(x, y--, Direction::North, true);
+      const Path p = join(x, y--, Direction::North, true);
+      exit_ = { x, y + 1, p.midpoint(), Config::kTileSize / 2 - 1 };
     }
   }
 }
@@ -248,7 +256,7 @@ void CaveFloor::join_random_rooms(int count) {
   }
 }
 
-bool CaveFloor::join_existing(int x, int y, Direction d) {
+CaveFloor::Path CaveFloor::join_existing(int x, int y, Direction d) {
   const Path p = get_path(x, y, d);
   if (p) {
     switch (d) {

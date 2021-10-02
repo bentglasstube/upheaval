@@ -22,4 +22,6 @@ class CaveScreen : public Screen {
     int shuffle_timer_;
     int fx_, fy_;
 
+    void move_to(const CaveFloor::Position& p);
+
 };

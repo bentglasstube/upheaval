@@ -2,8 +2,7 @@
 
 CaveScreen::CaveScreen() : caves_(8675309), player_(256, 224), shuffle_timer_(60000) {
   caves_.generate();
-  fx_ = caves_.startx();
-  fy_ = caves_.starty();
+  move_to(caves_.entrance());
 
   // TODO set player to start position
 }
@@ -23,8 +22,7 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
 
   if (input.key_pressed(Input::Button::A)) {
     caves_.generate();
-    fx_ = caves_.startx();
-    fy_ = caves_.starty();
+    move_to(caves_.entrance());
   }
 
   player_.update(caves_.cave(fx_, fy_), elapsed);
@@ -51,12 +49,10 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
 
   if (fy_ < 0) {
     caves_.generate();
-    fx_ = caves_.startx();
-    fy_ = caves_.starty();
+    move_to(caves_.entrance());
   } else if (fy_ > 3) {
     caves_.generate();
-    fx_ = caves_.startx();
-    fy_ = caves_.starty();
+    move_to(caves_.exit());
   }
 
   shuffle_timer_ -= elapsed;
@@ -77,4 +73,10 @@ void CaveScreen::draw(Graphics& graphics) const {
   /* int px = 4 * (fx_ * Cave::kMapWidth + player_.x() / Config::kTileSize); */
   /* int py = 4 * (fy_ * Cave::kMapHeight + player_.y() / Config::kTileSize); */
   /* graphics.draw_rect({px, py}, {px + 3, py + 3}, 0xd8ff00ff, true); */
+}
+
+void CaveScreen::move_to(const CaveFloor::Position& p) {
+  fx_ = p.cave_x;
+  fy_ = p.cave_y;
+  player_.set_position(p.player_x, p.player_y);
 }
