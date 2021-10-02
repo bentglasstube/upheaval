@@ -17,7 +17,7 @@ class Player {
     void stop();
 
     void update(const Cave& cave, unsigned int elapsed);
-    void draw(Graphics& graphics) const;
+    void draw(Graphics& graphics, int xo, int yo) const;
 
     Rect draw_box() const;
     Rect collision_box() const;

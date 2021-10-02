@@ -29,8 +29,7 @@ cc_library(
   deps = [
     "@libgam//:screen",
     "@libgam//:text",
-    ":cave",
-    ":cave_floor",
+    ":cave_system",
     ":player",
   ],
 )
@@ -83,3 +82,13 @@ cc_library(
   name = "direction",
   hdrs = ["direction.h"],
 )
+
+cc_library(
+  name = "cave_system",
+  srcs = ["cave_system.cc"],
+  hdrs = ["cave_system.h"],
+  deps = [
+    ":cave_floor",
+  ],
+)
+

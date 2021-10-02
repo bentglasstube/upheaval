@@ -3,7 +3,7 @@
 #include <cassert>
 #include <unordered_set>
 
-CaveFloor::CaveFloor(unsigned long seed) : rng_(seed) {}
+CaveFloor::CaveFloor(unsigned long seed, int floor) : rng_(seed), floor_(floor) {}
 
 void CaveFloor::draw(Graphics& graphics) const {
   for (int cy = 0; cy < 4; ++cy) {

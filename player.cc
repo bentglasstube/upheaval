@@ -41,8 +41,8 @@ void Player::update(const Cave& cave, unsigned int elapsed) {
   }
 }
 
-void Player::draw(Graphics& graphics) const {
-  draw_box().draw(graphics, 0, 0, 0xd8ff00ff, true);
+void Player::draw(Graphics& graphics, int xo, int yo) const {
+  draw_box().draw(graphics, xo, yo, 0xd8ff00ff, true);
 }
 
 Rect Player::draw_box() const {

@@ -10,7 +10,7 @@
 
 class CaveFloor {
   public:
-    CaveFloor(unsigned long seed);
+    CaveFloor(unsigned long seed, int floor);
 
     void draw(Graphics& graphics) const;
     void generate();
@@ -31,6 +31,7 @@ class CaveFloor {
   private:
 
     std::mt19937 rng_;
+    int floor_;
     std::array<Cave, 16> caves_;
     std::unordered_set<int> visited_;
     Position entrance_, exit_;

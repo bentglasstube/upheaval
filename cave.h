@@ -72,7 +72,7 @@ class Cave {
     };
 
     Cave();
-    void draw(Graphics& graphics) const;
+    void draw(Graphics& graphics, int xo, int yo) const;
     void generate(unsigned long seed);
 
     bool box_walkable(const Rect& r) const;

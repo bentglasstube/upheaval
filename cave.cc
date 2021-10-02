@@ -23,12 +23,12 @@ void Cave::generate(unsigned long seed) {
   // do more stuff
 }
 
-void Cave::draw(Graphics& graphics) const {
+void Cave::draw(Graphics& graphics, int xo, int yo) const {
   for (int y = 0; y < kMapHeight; ++y) {
     for (int x = 0; x < kMapWidth; ++x) {
       const Cell c = cells_[index(x, y)];
-      const Graphics::Point a = {x * Config::kTileSize, y * Config::kTileSize};
-      const Graphics::Point b = {a.x + Config::kTileSize, a.y + Config::kTileSize};
+      const Graphics::Point a = {x * Config::kTileSize - xo, y * Config::kTileSize - yo};
+      const Graphics::Point b = {a.x + Config::kTileSize - xo / 4, a.y + Config::kTileSize - yo / 4};
       if (c.seen) {
         graphics.draw_rect(a, b, c.tile.color(), true);
         if (!c.visible) graphics.draw_rect(a, b, 0x00000080, true);
