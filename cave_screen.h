@@ -21,6 +21,7 @@ class CaveScreen : public Screen {
     Player player_;
     int shuffle_timer_;
     int fx_, fy_;
+    bool cheater_mode_ = false;
 
     mutable std::mt19937 misc_rng_;
 

@@ -47,6 +47,8 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
     player_.set_position(player_.x(), ht - 1);
   }
 
+  if (input.key_pressed(Input::Button::Select)) cheater_mode_ = !cheater_mode_;
+
   if (fy_ < 0) {
     caves_.down();
     move_to(caves_.floor().entrance());
@@ -75,13 +77,15 @@ void CaveScreen::draw(Graphics& graphics) const {
   const int xo = shake > 0 ? offset(misc_rng_) : 0;
   const int yo = shake > 0 ? offset(misc_rng_) : 0;
 
-  caves_.floor().cave(fx_, fy_).draw(graphics, xo, yo);
-  player_.draw(graphics, xo, yo);
-
-  /* caves_.floor().draw(graphics); */
-  /* int px = 4 * (fx_ * Cave::kMapWidth + player_.x() / Config::kTileSize); */
-  /* int py = 4 * (fy_ * Cave::kMapHeight + player_.y() / Config::kTileSize); */
-  /* graphics.draw_rect({px, py}, {px + 4, py + 4}, 0xd8ff00ff, true); */
+  if (cheater_mode_) {
+    caves_.floor().draw(graphics);
+    int px = 4 * (fx_ * Cave::kMapWidth + player_.x() / Config::kTileSize);
+    int py = 4 * (fy_ * Cave::kMapHeight + player_.y() / Config::kTileSize);
+    graphics.draw_rect({px, py}, {px + 4, py + 4}, 0xd8ff00ff, true);
+  } else {
+    caves_.floor().cave(fx_, fy_).draw(graphics, xo, yo);
+    player_.draw(graphics, xo, yo);
+  }
 }
 
 void CaveScreen::move_to(const CaveFloor::Position& p) {
