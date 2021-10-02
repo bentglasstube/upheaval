@@ -31,6 +31,16 @@ class Cave {
           }
         }
 
+        bool occludes() const {
+          switch (value_) {
+            case Wall:
+            case OOB:
+              return true;
+            default:
+              return false;
+          }
+        }
+
         uint64_t color() const {
           switch (value_) {
             case Open:
@@ -38,7 +48,7 @@ class Cave {
             case Wall:
               return 0xaaaaaaff;
             case Hole:
-              return 0x000000ff;
+              return 0x222222ff;
             case Water:
               return 0x0000ffff;
             case Lava:
@@ -56,12 +66,19 @@ class Cave {
         Value value_;
     };
 
+    struct Cell {
+      Tile tile = Tile::OOB;
+      bool visible = false, seen = false;
+    };
+
     Cave();
     void draw(Graphics& graphics) const;
     void generate(unsigned long seed);
 
     bool box_walkable(const Rect& r) const;
     bool walkable(double px, double py) const;
+
+    void calculate_visibility(int x, int y, int max);
 
     friend class CaveFloor;
 
@@ -74,11 +91,27 @@ class Cave {
   private:
 
     std::mt19937 rng_;
-    std::array<Tile, kMapHeight * kMapWidth> tiles_;
+    std::array<Cell, kMapHeight * kMapWidth> cells_;
+
+    struct Shadow {
+      double start, end;
+      bool contains(const Shadow& other) const;
+    };
+
+    class ShadowLine {
+      public:
+        ShadowLine();
+        bool is_shadowed(const Shadow& shadow) const;
+        void add(const Shadow& shadow);
+
+      private:
+        std::vector<Shadow> shadows_;
+    };
 
     int index(int x, int y) const { return y * kMapWidth + x; }
     Tile get_tile(int x, int y) const;
     void set_tile(int x, int y, Tile t);
+    void set_visible(int x, int y, bool visible);
     int walls_near(int x, int y, int r) const;
 
     void fill_random(float rate);

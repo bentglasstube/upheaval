@@ -1,10 +1,10 @@
 #include "cave_screen.h"
 
+#include <cmath>
+
 CaveScreen::CaveScreen() : caves_(8675309), player_(256, 224), shuffle_timer_(60000) {
   caves_.generate();
   move_to(caves_.entrance());
-
-  // TODO set player to start position
 }
 
 bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
@@ -25,7 +25,8 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
     move_to(caves_.entrance());
   }
 
-  player_.update(caves_.cave(fx_, fy_), elapsed);
+  Cave& current = caves_.cave(fx_, fy_);
+  player_.update(current, elapsed);
 
   const Rect p = player_.collision_box();
 
@@ -54,6 +55,10 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
     caves_.generate();
     move_to(caves_.exit());
   }
+
+  const int px = std::floor(player_.x() / Config::kTileSize);
+  const int py = std::floor(player_.y() / Config::kTileSize);
+  current.calculate_visibility(px, py, 10);
 
   shuffle_timer_ -= elapsed;
   if (shuffle_timer_ < 0) {
