@@ -16,12 +16,12 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
     player_.stop();
   }
 
-  // player_.update(caves_[0], elapsed);
+  player_.update(caves_.cave(0, 3), elapsed);
 
   return true;
 }
 
 void CaveScreen::draw(Graphics& graphics) const {
-  caves_.draw(graphics);
-  // player_.draw(graphics);
+  caves_.cave(0, 3).draw(graphics);
+  player_.draw(graphics);
 }

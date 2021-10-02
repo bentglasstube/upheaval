@@ -15,6 +15,9 @@ class CaveFloor {
     void draw(Graphics& graphics) const;
     void generate();
 
+    Cave& cave(int x, int y);
+    const Cave& cave(int x, int y) const;
+
   private:
 
     std::mt19937 rng_;

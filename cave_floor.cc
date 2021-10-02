@@ -1,5 +1,6 @@
 #include "cave_floor.h"
 
+#include <cassert>
 #include <unordered_set>
 
 CaveFloor::CaveFloor(unsigned long seed) : rng_(seed) {
@@ -61,6 +62,18 @@ void CaveFloor::generate() {
   for (int i = 0; i < 5; ++i) {
     random_join(coord_picker(rng_), coord_picker(rng_));
   }
+}
+
+Cave& CaveFloor::cave(int x, int y) {
+  assert(x >= 0 && x < 4);
+  assert(y >= 0 && y < 4);
+  return caves_[4 * y + x];
+}
+
+const Cave& CaveFloor::cave(int x, int y) const {
+  assert(x >= 0 && x < 4);
+  assert(y >= 0 && y < 4);
+  return caves_[4 * y + x];
 }
 
 CaveFloor::Path CaveFloor::pick_path(int x, int y, Direction d) {
