@@ -53,8 +53,14 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
     caves_.down();
     move_to(caves_.floor().entrance());
   } else if (fy_ > 3) {
-    caves_.up();
-    move_to(caves_.floor().exit());
+    if (caves_.depth() == 0) {
+      // TODO check win condition
+      player_.set_position(player_.x(), height - ht - 1);
+      fy_ = 3;
+    } else {
+      caves_.up();
+      move_to(caves_.floor().exit());
+    }
   }
 
   shuffle_timer_ -= elapsed;
