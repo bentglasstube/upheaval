@@ -14,6 +14,7 @@ class CaveScreen : public Screen {
     void draw(Graphics&) const override;
 
     Screen* next_screen() const override { return nullptr; }
+    std::string get_music_track() const { return "cave-funk.ogg"; }
 
   private:
 
