@@ -30,6 +30,10 @@ class Player {
 
     bool has_amulet() const { return has_amulet_; }
 
+#ifndef NDEBUG
+    void give_amulet() { has_amulet_ = true; }
+#endif
+
   private:
 
     static constexpr double kSpeed = 0.075;

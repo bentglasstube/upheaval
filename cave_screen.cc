@@ -5,10 +5,12 @@
 
 #include "util.h"
 
+#include "win_screen.h"
+
 CaveScreen::CaveScreen() :
   caves_(Util::random_seed()),
   player_(256, 224),
-  shuffle_timer_(60000), music_timer_(0) {
+  shuffle_timer_(60000), music_timer_(0.0), play_time_(0.0) {
   move_to(caves_.floor().entrance());
 }
 
@@ -17,6 +19,8 @@ bool CaveScreen::update(const Input& input, Audio& audio, unsigned int elapsed) 
   if (music_timer_ > 8145732 / 48000.0) {
     music_timer_ -= (8145732 - 478444) / 48000.0;
   }
+
+  play_time_ += elapsed / 1000.0f;
 
   if (!audio.music_playing()) {
     switch_music(audio);
@@ -65,6 +69,10 @@ bool CaveScreen::update(const Input& input, Audio& audio, unsigned int elapsed) 
 
 #ifndef NDEBUG
   if (input.key_pressed(Input::Button::Select)) cheater_mode_ = !cheater_mode_;
+  if (input.key_pressed(Input::Button::B)) {
+    player_.give_amulet();
+    play_time_ += Util::random_seed() % 3600;
+  }
 #endif
 
   if (fy_ < 0) {
@@ -74,7 +82,6 @@ bool CaveScreen::update(const Input& input, Audio& audio, unsigned int elapsed) 
   } else if (fy_ > 3) {
     if (caves_.depth() == 0) {
       if (player_.has_amulet()) {
-        // TODO win screen?
         return false;
       }
       player_.set_position(player_.x(), height - ht - 1);
@@ -139,4 +146,12 @@ void CaveScreen::switch_music(Audio& audio) const {
   const std::string music = "funky-cave-" + std::to_string(caves_.depth()) + ".ogg";
   audio.play_music(music, 1);
   Mix_SetMusicPosition(music_timer_);
+}
+
+Screen* CaveScreen::next_screen() const {
+  if (player_.has_amulet()) {
+    return new WinScreen(play_time_);
+  } else {
+    return new TitleScreen();
+  }
 }

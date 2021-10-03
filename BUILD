@@ -21,10 +21,12 @@ cc_library(
   srcs = [
     "cave_screen.cc",
     "title_screen.cc",
+    "win_screen.cc",
   ],
   hdrs = [
     "cave_screen.h",
     "title_screen.h",
+    "win_screen.h",
   ],
   deps = [
     "@libgam//:backdrop",
