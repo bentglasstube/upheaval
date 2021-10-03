@@ -82,6 +82,7 @@ bool CaveScreen::update(const Input& input, Audio& audio, unsigned int elapsed) 
   } else if (fy_ > 3) {
     if (caves_.depth() == 0) {
       if (player_.has_amulet()) {
+        audio.play_music("title.ogg", true);
         return false;
       }
       player_.set_position(player_.x(), height - ht - 1);
@@ -144,7 +145,7 @@ int CaveScreen::shake_amount() const {
 
 void CaveScreen::switch_music(Audio& audio) const {
   const std::string music = "funky-cave-" + std::to_string(caves_.depth()) + ".ogg";
-  audio.play_music(music, 1);
+  audio.play_music(music, true);
   Mix_SetMusicPosition(music_timer_);
 }
 
