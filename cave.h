@@ -5,6 +5,7 @@
 
 #include "graphics.h"
 #include "rect.h"
+#include "spritemap.h"
 
 #include "config.h"
 
@@ -13,7 +14,14 @@ class Cave {
 
     class Tile {
       public:
-        enum Value : uint8_t { Open, Wall, Hole, Water, Lava, ExitUp, ExitDown, OOB, Keep, Amulet, ExAmulet };
+        enum Value : uint8_t {
+          Open,
+          Wall, WallFace,
+          Hole, Water, Lava,
+          ExitUp, ExitDown,
+          Chest, OpenChest,
+          OOB, Keep
+        };
 
         constexpr Tile() : value_(Wall) {}
         constexpr Tile(Value v) : value_(v) {}
@@ -25,7 +33,6 @@ class Cave {
             case Open:
             case ExitUp:
             case ExitDown:
-            case ExAmulet:
               return false;
             default:
               return true;
@@ -45,9 +52,9 @@ class Cave {
         uint64_t color() const {
           switch (value_) {
             case Open:
-            case ExAmulet:
               return 0x993311ff;
             case Wall:
+            case WallFace:
               return 0xaaaaaaff;
             case Hole:
               return 0x222222ff;
@@ -59,8 +66,10 @@ class Cave {
               return 0xcc6622ff;
             case ExitDown:
               return 0x551100ff;
-            case Amulet:
-              return 0x9911ffff;
+            case Chest:
+              return 0xffff00ff;
+            case OpenChest:
+              return 0x997700ff;
             default:
               return 0xff00ffff;
           }
@@ -73,6 +82,7 @@ class Cave {
     struct Cell {
       Tile tile = Tile::OOB;
       bool visible = false, seen = false;
+      int sprite = 0;
     };
 
     Cave();
@@ -96,6 +106,7 @@ class Cave {
 
   private:
 
+    SpriteMap tiles_;
     std::mt19937 rng_;
     std::array<Cell, kMapHeight * kMapWidth> cells_;
 
@@ -132,4 +143,7 @@ class Cave {
     bool has_treasure() const;
 
     int flood_fill(int x, int y, Tile from, Tile to);
+    void pick_sprite(int x, int y);
+    void pick_all_sprites();
+    bool match_or_oob(int x, int y, Tile match);
 };

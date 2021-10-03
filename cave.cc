@@ -4,7 +4,7 @@
 #include <cmath>
 #include <stack>
 
-Cave::Cave() {}
+Cave::Cave() : tiles_("tiles.png", 8, 16, 16) {}
 
 void Cave::generate(unsigned long seed) {
   rng_.seed(seed);
@@ -19,8 +19,6 @@ void Cave::generate(unsigned long seed) {
 
   for (int i = 0; i < 5; ++i) add_hole();
   add_spice(Tile::Water);
-
-  // do more stuff
 }
 
 void Cave::draw(Graphics& graphics, int xo, int yo) const {
@@ -28,9 +26,9 @@ void Cave::draw(Graphics& graphics, int xo, int yo) const {
     for (int x = 0; x < kMapWidth; ++x) {
       const Cell c = cells_[index(x, y)];
       const Graphics::Point a = {x * Config::kTileSize - xo, y * Config::kTileSize - yo};
-      const Graphics::Point b = {a.x + Config::kTileSize - xo / 4, a.y + Config::kTileSize - yo / 4};
+      const Graphics::Point b = {a.x + Config::kTileSize, a.y + Config::kTileSize};
       if (c.seen) {
-        graphics.draw_rect(a, b, c.tile.color(), true);
+        tiles_.draw(graphics, c.sprite, a.x, a.y);
         if (!c.visible) graphics.draw_rect(a, b, 0x00000080, true);
       }
     }
@@ -48,7 +46,11 @@ void Cave::set_tile(int x, int y, Tile t) {
   assert(x >= 0 && x < kMapWidth);
   assert(y >= 0 && y < kMapHeight);
 
-  cells_[index(x, y)].tile = t;
+  Cell& c = cells_[index(x, y)];
+  c.tile = t;
+
+  if (t == Tile::Chest) c.sprite = 72;
+  else if (t == Tile::OpenChest) c.sprite = 73;
 }
 
 void Cave::set_visible(int x, int y, bool visible) {
@@ -307,7 +309,7 @@ void Cave::add_treasure() {
     int y = ry(rng_);
 
     if (get_tile(x, y) == Tile::Open) {
-      set_tile(x, y, Tile::Amulet);
+      set_tile(x, y, Tile::Chest);
       return;
     }
   }
@@ -315,14 +317,62 @@ void Cave::add_treasure() {
 
 bool Cave::has_treasure() const {
   for (const auto& c : cells_) {
-    if (c.tile == Tile::Amulet) return true;
-    if (c.tile == Tile::ExAmulet) return true;
+    if (c.tile == Tile::Chest) return true;
+    if (c.tile == Tile::OpenChest) return true;
   }
   return false;
 }
 
 void Cave::take_amulet(int x, int y) {
-  if (get_tile(x, y) == Tile::Amulet) {
-    set_tile(x, y, Tile::ExAmulet);
+  if (get_tile(x, y) == Tile::Chest) {
+    set_tile(x, y, Tile::OpenChest);
+  }
+}
+
+bool Cave::match_or_oob(int x, int y, Tile match) {
+  const Tile t = get_tile(x, y);
+  return t == match || t == Tile::OOB;
+}
+
+void Cave::pick_sprite(int x, int y) {
+  Cell& c = cells_[index(x, y)];
+
+  switch (c.tile) {
+    case Tile::Open: c.sprite = 4; return;
+    case Tile::Chest: c.sprite = 72; return;
+    case Tile::OpenChest: c.sprite = 73; return;
+    default: break;
+  }
+
+  const int lr = (match_or_oob(x - 1, y, c.tile) ? 1 : 0) +
+                 (match_or_oob(x + 1, y, c.tile) ? 2 : 0);
+
+  switch (c.tile) {
+    case Tile::ExitUp:   c.sprite = 0 + lr; return;
+    case Tile::ExitDown: c.sprite = 4 + lr; return;
+    default: break;
+  }
+
+  const int nesw = (match_or_oob(x - 1, y, c.tile) ? 1 : 0) +
+                   (match_or_oob(x, y + 1, c.tile) ? 2 : 0) +
+                   (match_or_oob(x + 1, y, c.tile) ? 4 : 0) +
+                   (match_or_oob(x, y - 1, c.tile) ? 8 : 0);
+
+  switch (c.tile) {
+    case Tile::Wall:  c.sprite =  8 + nesw; return;
+    case Tile::Hole:  c.sprite = 24 + nesw; return;
+    case Tile::Water: c.sprite = 40 + nesw; return;
+    case Tile::Lava:  c.sprite = 56 + nesw; return;
+    default: break;
+  }
+
+  c.sprite = 0;
+}
+
+void Cave::pick_all_sprites() {
+  for (int y = 0; y < kMapHeight; ++y) {
+    for (int x = 0; x < kMapWidth; ++x) {
+      pick_sprite(x, y);
+    }
   }
 }

@@ -52,6 +52,7 @@ cc_library(
   deps = [
     "@libgam//:graphics",
     "@libgam//:rect",
+    "@libgam//:spritemap",
     ":config",
   ],
 )
@@ -63,6 +64,7 @@ cc_library(
   deps = [
     "@libgam//:graphics",
     "@libgam//:rect",
+    "@libgam//:spritemap",
     ":cave",
     ":config",
     ":direction",

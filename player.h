@@ -2,6 +2,7 @@
 
 #include "graphics.h"
 #include "rect.h"
+#include "spritemap.h"
 
 #include "cave.h"
 #include "direction.h"
@@ -31,14 +32,18 @@ class Player {
 
   private:
 
-    static constexpr double kSpeed = 0.175;
+    static constexpr double kSpeed = 0.075;
+    static constexpr int kAnimationTime = 125;
 
     double x_, y_;
     Direction facing_;
     State state_;
     bool has_amulet_;
+    SpriteMap sprites_;
+    int timer_;
 
     bool move_if_possible(const Cave& cave, double dx, double dy);
     bool collision(const Cave& cave) const;
+    int sprite_number() const;
 
 };

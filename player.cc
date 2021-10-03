@@ -8,7 +8,9 @@ Player::Player(int x, int y) :
   x_(x), y_(y),
   facing_(Direction::North),
   state_(State::Waiting),
-  has_amulet_(false) {}
+  has_amulet_(false),
+  sprites_("char.png", 4, 16, 24),
+  timer_(0) {}
 
 void Player::move(Direction dir) {
   state_ = State::Walking;
@@ -20,32 +22,26 @@ void Player::stop() {
 }
 
 void Player::update(const Cave& cave, unsigned int elapsed) {
-  // generic
-
   if (state_ == State::Walking) {
     const double delta = kSpeed * elapsed;
+    double dx = 0, dy = 0;
     switch (facing_) {
-      case Direction::North:
-        move_if_possible(cave, 0, -delta);
-        break;
+      case Direction::North: dy = -delta; break;
+      case Direction::East:  dx = delta;  break;
+      case Direction::South: dy = delta;  break;
+      case Direction::West:  dx = -delta; break;
+    }
 
-      case Direction::East:
-        move_if_possible(cave, delta, 0);
-        break;
-
-      case Direction::South:
-        move_if_possible(cave, 0, delta);
-        break;
-
-      case Direction::West:
-        move_if_possible(cave, -delta, 0);
-        break;
+    if (move_if_possible(cave, dx, dy)) {
+      timer_ = (timer_ + elapsed) % (kAnimationTime * 4);
     }
   }
 }
 
 void Player::draw(Graphics& graphics, int xo, int yo) const {
-  draw_box().draw(graphics, xo, yo, 0xd8ff00ff, true);
+  const int x = x_ - xo - Config::kTileSize / 2;
+  const int y = y_ - yo - Config::kTileSize;
+  sprites_.draw(graphics, sprite_number(), x, y);
 }
 
 Rect Player::draw_box() const {
@@ -98,9 +94,16 @@ void Player::interact(Cave& cave) {
     case Direction::West:  --px; break;
   }
 
-  if (cave.get_tile(px, py) == Cave::Tile::Amulet) {
+  if (cave.get_tile(px, py) == Cave::Tile::Chest) {
     cave.take_amulet(px, py);
     has_amulet_ = true;
   }
+}
 
+int Player::sprite_number() const {
+  int d = 4 * facing_;
+  if (state_ == State::Walking) {
+    d += timer_ / kAnimationTime;
+  }
+  return d;
 }

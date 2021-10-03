@@ -39,6 +39,8 @@ void CaveFloor::generate() {
   path_to_exit(x, y);
   join_unvisited_rooms();
   join_random_rooms(5);
+
+  for (auto& c : caves_) c.pick_all_sprites();
 }
 
 Cave& CaveFloor::cave(int x, int y) {
@@ -206,6 +208,8 @@ void CaveFloor::shuffle_rooms(int keep_x, int keep_y) {
 
   join_unvisited_rooms();
   join_random_rooms(5);
+
+  for (auto& c : caves_) c.pick_all_sprites();
 }
 
 void CaveFloor::path_to_entrance(int x, int y) {
