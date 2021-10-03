@@ -5,11 +5,11 @@
     <key>CFBundleExecutable</key>
     <string>launcher</string>
     <key>CFBundleIdentifier</key>
-    <string>org.eatabrick.ld49</string>
+    <string>org.eatabrick.upheaval</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>ld49</string>
+    <string>Upheaval</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
   </dict>

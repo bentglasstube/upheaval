@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
-  name = "ld49",
+  name = "upheaval",
   data = ["//content"],
   linkopts = [
     "-lSDL2",

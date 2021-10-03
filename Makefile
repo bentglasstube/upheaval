@@ -8,7 +8,7 @@ CONTENT=$(wildcard content/*)
 ICONS=icon.png
 BUILDDIR=$(CROSS)output
 OBJECTS=$(patsubst %.cc,$(BUILDDIR)/%.o,$(SOURCES))
-NAME=ld49
+NAME=upheaval
 VERSION=$(shell git describe --tags --dirty)
 
 BACKDROPS=content/title.png content/story.png content/winner.png

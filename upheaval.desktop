@@ -2,8 +2,8 @@
 
 Type=Application
 Version=1.0
-Name=ld49
+Name=Upheaval
 Terminal=false
 Icon=icon
-Exec=ld49
+Exec=upheaval
 Categories=Game;
