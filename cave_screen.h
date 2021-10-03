@@ -26,6 +26,7 @@ class CaveScreen : public Screen {
     double music_timer_, play_time_;
     int fx_, fy_;
     bool cheater_mode_ = false;
+    bool quake_tut_shown_ = false;
 
     mutable std::mt19937 misc_rng_;
 

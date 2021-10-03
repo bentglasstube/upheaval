@@ -107,6 +107,17 @@ bool CaveScreen::update(const Input& input, Audio& audio, unsigned int elapsed) 
       }
     }
 
+    shuffle_timer_ -= elapsed;
+    if (shuffle_timer_ < 0) {
+      caves_.floor().shuffle_rooms(fx_, fy_);
+      shuffle_timer_ = 60000;
+
+      if (!quake_tut_shown_) {
+        dialog_.set_message("Wow!  That was quite an earthquake.  It\nsounded like stones grinding and felt as\nthough the cave itself was moving.");
+        quake_tut_shown_ = true;
+      }
+    }
+
     player_.update(caves_.floor().cave(fx_, fy_), elapsed);
   }
 
@@ -158,12 +169,6 @@ bool CaveScreen::update(const Input& input, Audio& audio, unsigned int elapsed) 
       move_to(caves_.floor().exit());
       switch_music(audio);
     }
-  }
-
-  shuffle_timer_ -= elapsed;
-  if (shuffle_timer_ < 0) {
-    caves_.floor().shuffle_rooms(fx_, fy_);
-    shuffle_timer_ = 60000;
   }
 
   const int px = std::floor(player_.x() / Config::kTileSize);
