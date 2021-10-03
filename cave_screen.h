@@ -3,6 +3,7 @@
 #include "screen.h"
 
 #include "cave_system.h"
+#include "dialog.h"
 #include "player.h"
 
 class CaveScreen : public Screen {
@@ -19,6 +20,8 @@ class CaveScreen : public Screen {
 
     CaveSystem caves_;
     Player player_;
+    Dialog dialog_;
+
     int shuffle_timer_;
     double music_timer_, play_time_;
     int fx_, fy_;

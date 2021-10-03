@@ -27,27 +27,39 @@ bool CaveScreen::update(const Input& input, Audio& audio, unsigned int elapsed) 
     music_timer_ = 0;
   }
 
-  if (input.key_held(Input::Button::Left)) {
-    player_.move(Direction::West);
-  } else if (input.key_held(Input::Button::Right)) {
-    player_.move(Direction::East);
-  } else if (input.key_held(Input::Button::Up)) {
-    player_.move(Direction::North);
-  } else if (input.key_held(Input::Button::Down)) {
-    player_.move(Direction::South);
+  if (dialog_) {
+
+    dialog_.update(elapsed);
+    if (input.key_pressed(Input::Button::A)) {
+      if (dialog_.done()) {
+        dialog_.dismiss();
+      } else {
+        dialog_.finish();
+      }
+    }
+
   } else {
-    player_.stop();
-  }
 
-  if (input.key_pressed(Input::Button::A)) {
-    player_.interact(caves_.floor().cave(fx_, fy_));
-  }
+    if (input.key_held(Input::Button::Left)) {
+      player_.move(Direction::West);
+    } else if (input.key_held(Input::Button::Right)) {
+      player_.move(Direction::East);
+    } else if (input.key_held(Input::Button::Up)) {
+      player_.move(Direction::North);
+    } else if (input.key_held(Input::Button::Down)) {
+      player_.move(Direction::South);
+    } else {
+      player_.stop();
+    }
 
-  player_.update(caves_.floor().cave(fx_, fy_), elapsed);
+    if (input.key_pressed(Input::Button::A)) {
+      player_.interact(caves_.floor().cave(fx_, fy_));
+    }
+
+    player_.update(caves_.floor().cave(fx_, fy_), elapsed);
+  }
 
   const Rect p = player_.collision_box();
-
-  // TODO screen transitions
 
   const int height = Cave::pixel_height();
   const int width = Cave::pixel_width();
@@ -85,6 +97,9 @@ bool CaveScreen::update(const Input& input, Audio& audio, unsigned int elapsed) 
         audio.play_music("title.ogg", true);
         return false;
       }
+
+      dialog_.set_message("I can't leave until I find the amulet.");
+
       player_.set_position(player_.x(), height - ht - 1);
       fy_ = 3;
     } else {
@@ -123,6 +138,8 @@ void CaveScreen::draw(Graphics& graphics) const {
     caves_.floor().cave(fx_, fy_).draw(graphics, xo, yo);
     player_.draw(graphics, xo, yo);
   }
+
+  if (dialog_) dialog_.draw(graphics);
 }
 
 void CaveScreen::move_to(const CaveFloor::Position& p) {

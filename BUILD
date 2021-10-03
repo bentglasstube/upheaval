@@ -34,6 +34,7 @@ cc_library(
     "@libgam//:text",
     "@libgam//:util",
     ":cave_system",
+    ":dialog",
     ":player",
   ],
 )
@@ -98,3 +99,12 @@ cc_library(
   ],
 )
 
+cc_library(
+  name = "dialog",
+  srcs = ["dialog.cc"],
+  hdrs = ["dialog.h"],
+  deps = [
+    "@libgam//:box",
+    "@libgam//:text",
+  ],
+)
