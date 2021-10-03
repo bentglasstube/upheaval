@@ -21,5 +21,12 @@ class TitleScreen : public Screen {
 
     Text text_;
     Backdrop backdrop_;
+    Backdrop story_;
+    Dialog dialog_;
+
+    int story_timer_ = 15000;
+    int story_text_ = 0;
+
+    void load_story_text();
 
 };

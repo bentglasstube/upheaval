@@ -22,6 +22,6 @@ void Dialog::update(unsigned int elapsed) {
 }
 
 void Dialog::draw(Graphics& graphics) const {
-  box_.draw(graphics, 64, 64, graphics.width() - 128, 128);
-  text_.draw(graphics, message_.substr(0, index_), 80, 80);
+  box_.draw(graphics, 64, 32, graphics.width() - 128, 128);
+  text_.draw(graphics, message_.substr(0, index_), 80, 48);
 }
