@@ -13,6 +13,14 @@ bool TitleScreen::update(const Input& input, Audio&, unsigned int elapsed) {
   if (!dialog_) load_story_text();
   dialog_.update(elapsed);
 
+  if (dialog_.done()) {
+    story_timeout_ -= elapsed;
+    if (story_timeout_ < 0) {
+      ++story_text_;
+      dialog_.dismiss();
+    }
+  }
+
   if (input.key_pressed(Input::Button::A)) {
     if (dialog_.done()) {
       ++story_text_;
@@ -57,4 +65,6 @@ void TitleScreen::load_story_text() {
       story_timer_ = 15000;
       story_text_ = 0;
   }
+
+  story_timeout_ = 10000;
 }
