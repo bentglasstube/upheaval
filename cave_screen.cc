@@ -53,7 +53,58 @@ bool CaveScreen::update(const Input& input, Audio& audio, unsigned int elapsed) 
     }
 
     if (input.key_pressed(Input::Button::A)) {
-      player_.interact(caves_.floor().cave(fx_, fy_));
+      const Cave::Cell c = player_.interact(caves_.floor().cave(fx_, fy_));
+
+      switch (c.tile) {
+        case Cave::Tile::Open:
+          dialog_.set_message("I searched the ground all about.\n         \nBut there found nothing.");
+          break;
+
+        case Cave::Tile::Wall:
+          if (c.sprite == 8) {
+            dialog_.set_message("This rock is strangely familiar.");
+          } else {
+            dialog_.set_message("The walls of the cave block my way.");
+          }
+          break;
+
+        case Cave::Tile::Hole:
+          dialog_.set_message("It's a hole.  I can't see the bottom.");
+          break;
+
+        case Cave::Tile::Water:
+          dialog_.set_message("The water doesn't look very clean.  I had\nbetter leave it alone.");
+          break;
+
+        case Cave::Tile::Lava:
+          dialog_.set_message("I guess I'm deep enough to find lava now.\nBest to stay away from it.");
+          break;
+
+        case Cave::Tile::ExitUp:
+          dialog_.set_message("This leads back out of the cave.");
+          break;
+
+        case Cave::Tile::ExitDown:
+          dialog_.set_message("This leads further into the cave.");
+          break;
+
+        case Cave::Tile::Chest:
+          if (player_.has_amulet()) {
+            dialog_.set_message("I already have what I came for.  There's no\nneed to be greedy.");
+          } else {
+            dialog_.set_message("At last, I've found the Rorschart Amulet!");
+            player_.give_amulet();
+            caves_.floor().cave(fx_, fy_).open_chest();
+          }
+
+          break;
+
+        case Cave::Tile::OpenChest:
+          dialog_.set_message("This chest is empty.");
+          break;
+
+        default: break;
+      }
     }
 
     player_.update(caves_.floor().cave(fx_, fy_), elapsed);

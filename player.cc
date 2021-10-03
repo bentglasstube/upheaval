@@ -87,7 +87,7 @@ bool Player::collision(const Cave& cave) const {
   return !cave.box_walkable(collision_box());
 }
 
-void Player::interact(Cave& cave) {
+Cave::Cell Player::interact(const Cave& cave) const {
   int px = std::floor(x_ / Config::kTileSize);
   int py = std::floor(y_ / Config::kTileSize);
 
@@ -98,10 +98,7 @@ void Player::interact(Cave& cave) {
     case Direction::West:  --px; break;
   }
 
-  if (cave.get_tile(px, py) == Cave::Tile::Chest) {
-    cave.take_amulet(px, py);
-    has_amulet_ = true;
-  }
+  return cave.get_cell(px, py);
 }
 
 int Player::sprite_number() const {

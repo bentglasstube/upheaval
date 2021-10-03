@@ -16,7 +16,7 @@ class Player {
 
     void move(Direction dir);
     void stop();
-    void interact(Cave& cave);
+    Cave::Cell interact(const Cave& cave) const;
 
     void update(const Cave& cave, unsigned int elapsed);
     void draw(Graphics& graphics, int xo, int yo) const;
@@ -29,10 +29,7 @@ class Player {
     void set_position(int x, int y);
 
     bool has_amulet() const { return has_amulet_; }
-
-#ifndef NDEBUG
     void give_amulet() { has_amulet_ = true; }
-#endif
 
   private:
 

@@ -94,7 +94,8 @@ class Cave {
 
     void calculate_visibility(int x, int y, int max);
     Tile get_tile(int x, int y) const;
-    void take_amulet(int x, int y);
+    Cell get_cell(int x, int y) const;
+    void open_chest();
 
     friend class CaveFloor;
 

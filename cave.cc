@@ -36,10 +36,14 @@ void Cave::draw(Graphics& graphics, int xo, int yo) const {
 }
 
 Cave::Tile Cave::get_tile(int x, int y) const {
-  if (x < 0 || x >= kMapWidth) return Tile::OOB;
-  if (y < 0 || y >= kMapHeight) return Tile::OOB;
+  return get_cell(x, y).tile;
+}
 
-  return cells_[index(x, y)].tile;
+Cave::Cell Cave::get_cell(int x, int y) const {
+  if (x < 0 || x >= kMapWidth) return Cell();
+  if (y < 0 || y >= kMapHeight) return Cell();
+
+  return cells_[index(x, y)];
 }
 
 void Cave::set_tile(int x, int y, Tile t) {
@@ -323,9 +327,14 @@ bool Cave::has_treasure() const {
   return false;
 }
 
-void Cave::take_amulet(int x, int y) {
-  if (get_tile(x, y) == Tile::Chest) {
-    set_tile(x, y, Tile::OpenChest);
+void Cave::open_chest() {
+  for (int y = 0; y < kMapHeight; ++y) {
+    for (int x = 0; x < kMapWidth; ++x) {
+      if (get_tile(x, y) == Tile::Chest) {
+        set_tile(x, y, Tile::OpenChest);
+        return;
+      }
+    }
   }
 }
 
