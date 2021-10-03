@@ -11,6 +11,8 @@ OBJECTS=$(patsubst %.cc,$(BUILDDIR)/%.o,$(SOURCES))
 NAME=ld49
 VERSION=$(shell git describe --tags --dirty)
 
+BACKDROPS=content/title.png content/story.png content/winner.png
+
 CC=$(CROSS)g++
 LD=$(CROSS)ld
 AR=$(CROSS)ar
@@ -50,6 +52,11 @@ echo:
 
 run: $(EXECUTABLE)
 	./$(EXECUTABLE)
+
+backdrops: $(BACKDROPS)
+
+content/%.png: resources/%.ase
+	aseprite --batch $< --save-as $@
 
 $(EXECUTABLE): $(OBJECTS) $(EXTRA)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJECTS) $(EXTRA) $(LDLIBS)
@@ -130,4 +137,4 @@ distclean: clean
 	rm -rf *.html *.js *.data *.wasm
 	rm -rf *-web-*/ *output/
 
-.PHONY: all echo clean distclean run package wasm web
+.PHONY: all echo clean distclean run package wasm web backdrops
