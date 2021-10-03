@@ -63,7 +63,9 @@ bool CaveScreen::update(const Input& input, Audio& audio, unsigned int elapsed) 
     player_.set_position(player_.x(), ht - 1);
   }
 
+#ifndef NDEBUG
   if (input.key_pressed(Input::Button::Select)) cheater_mode_ = !cheater_mode_;
+#endif
 
   if (fy_ < 0) {
     caves_.down();
