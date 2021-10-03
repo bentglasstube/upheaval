@@ -1,14 +1,28 @@
 #include "cave_screen.h"
 
 #include <cmath>
+#include <SDL2/SDL_mixer.h>
 
 #include "util.h"
 
-CaveScreen::CaveScreen() : caves_(Util::random_seed()), player_(256, 224), shuffle_timer_(60000) {
+CaveScreen::CaveScreen() :
+  caves_(Util::random_seed()),
+  player_(256, 224),
+  shuffle_timer_(60000), music_timer_(0) {
   move_to(caves_.floor().entrance());
 }
 
-bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
+bool CaveScreen::update(const Input& input, Audio& audio, unsigned int elapsed) {
+  music_timer_ += elapsed / 1000.0f;
+  if (music_timer_ > 8145732 / 48000.0) {
+    music_timer_ -= (8145732 - 478444) / 48000.0;
+  }
+
+  if (!audio.music_playing()) {
+    switch_music(audio);
+    music_timer_ = 0;
+  }
+
   if (input.key_held(Input::Button::Left)) {
     player_.move(Direction::West);
   } else if (input.key_held(Input::Button::Right)) {
@@ -54,6 +68,7 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
   if (fy_ < 0) {
     caves_.down();
     move_to(caves_.floor().entrance());
+    switch_music(audio);
   } else if (fy_ > 3) {
     if (caves_.depth() == 0) {
       if (player_.has_amulet()) {
@@ -65,6 +80,7 @@ bool CaveScreen::update(const Input& input, Audio&, unsigned int elapsed) {
     } else {
       caves_.up();
       move_to(caves_.floor().exit());
+      switch_music(audio);
     }
   }
 
@@ -115,4 +131,10 @@ int CaveScreen::shake_amount() const {
   } else {
     return 0;
   }
+}
+
+void CaveScreen::switch_music(Audio& audio) const {
+  const std::string music = "funky-cave-" + std::to_string(caves_.depth()) + ".ogg";
+  audio.play_music(music, 1);
+  Mix_SetMusicPosition(music_timer_);
 }

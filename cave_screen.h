@@ -14,13 +14,13 @@ class CaveScreen : public Screen {
     void draw(Graphics&) const override;
 
     Screen* next_screen() const override { return nullptr; }
-    std::string get_music_track() const { return "cave-funk.ogg"; }
 
   private:
 
     CaveSystem caves_;
     Player player_;
     int shuffle_timer_;
+    double music_timer_;
     int fx_, fy_;
     bool cheater_mode_ = false;
 
@@ -28,5 +28,7 @@ class CaveScreen : public Screen {
 
     void move_to(const CaveFloor::Position& p);
     int shake_amount() const;
+
+    void switch_music(Audio& audio) const;
 
 };
