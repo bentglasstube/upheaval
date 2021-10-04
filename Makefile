@@ -3,21 +3,24 @@ ifeq ($(UNAME), Windows)
 	CROSS=x86_64-w64-mingw32.static-
 endif
 
-SOURCES=$(wildcard *.cc) $(wildcard gam/*.cc)
-CONTENT=$(wildcard content/*)
+NAME=upheaval
+GAM_DEPS=audio backdrop box game graphics input rect screen spritemap text util
+
+GAM_SOURCES=$(patsubst %,gam/%.cc,$(GAM_DEPS))
+ASEFILES=$(wildcard resources/*.ase)
+RENDERS=$(patsubst resources/%.ase,content/%.png,$(ASEFILES))
+SOURCES=$(wildcard *.cc) $(GAM_SOURCES)
+CONTENT=$(wildcard content/*) $(RENDERS)
 ICONS=icon.png
 BUILDDIR=$(CROSS)output
 OBJECTS=$(patsubst %.cc,$(BUILDDIR)/%.o,$(SOURCES))
-NAME=upheaval
 VERSION=$(shell git describe --tags --dirty)
 
-BACKDROPS=content/title.png content/story.png content/winner.png
-
-CC=$(CROSS)g++
+CXX=$(CROSS)g++
 LD=$(CROSS)ld
 AR=$(CROSS)ar
 PKG_CONFIG=$(CROSS)pkg-config
-CFLAGS=-O3 --std=c++17 -Wall -Wextra -Werror -pedantic -I gam -DNDEBUG
+CXXFLAGS=-O3 --std=c++17 -Wall -Wextra -Werror -pedantic -I gam -DNDEBUG
 EMFLAGS=-s USE_SDL=2 -s USE_SDL_MIXER=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["png"]' -s USE_OGG=1 -s USE_VORBIS=1 -s ALLOW_MEMORY_GROWTH=1 -fno-rtti -fno-exceptions
 EXTRA=
 
@@ -38,34 +41,37 @@ endif
 ifeq ($(UNAME), Darwin)
 	PACKAGE=$(NAME)-macos-$(VERSION).dmg
 	LDLIBS=-framework SDL2 -framework SDL2_mixer -framework SDL2_image -rpath @executable_path/../Frameworks -F /Library/Frameworks/
-	CFLAGS+=-mmacosx-version-min=10.9
+	CXXFLAGS+=-mmacosx-version-min=10.9
 endif
+
+.PHONY: all echo clean distclean run package wasm web renders
 
 all: $(EXECUTABLE)
 
 echo:
 	@echo "Content: $(CONTENT)"
+	@echo "Renders: $(RENDERS)"
 	@echo "Sources: $(SOURCES)"
 	@echo "Uname: $(UNAME)"
 	@echo "Package: $(PACKAGE)"
 	@echo "Version: $(VERSION)"
 
-run: $(EXECUTABLE)
-	./$(EXECUTABLE)
-
-backdrops: $(BACKDROPS)
+renders: $(RENDERS)
 
 content/%.png: resources/%.ase
 	aseprite --batch $< --save-as $@
 
+run: $(EXECUTABLE) $(CONTENT)
+	./$(EXECUTABLE)
+
 $(EXECUTABLE): $(OBJECTS) $(EXTRA)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJECTS) $(EXTRA) $(LDLIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 $(BUILDDIR)/%.o: %.cc
-	@mkdir -p $(BUILDDIR)/gam
-	$(CC) -c $(CFLAGS) -o $@ $<
+	@mkdir -p $(dir $@)
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-package: $(PACKAGE)
+package: $(PACKAGE) $(RENDERS)
 
 $(BUILDDIR)/icon.res.o: $(BUILDDIR)/icon.rc
 	$(CROSS)windres $< -O coff $@
@@ -101,7 +107,7 @@ $(NAME)-windows-$(VERSION).zip: $(EXECUTABLE) $(CONTENT)
 	rm -rf $(NAME)
 
 $(NAME)-$(VERSION).html: $(SOURCES) $(CONTENT)
-	emcc $(CFLAGS) $(EMFLAGS) -o $@ $(SOURCES) --preload-file content/
+	emcc $(CXXFLAGS) $(EMFLAGS) -o $@ $(SOURCES) --preload-file content/
 
 $(NAME).app: $(EXECUTABLE) launcher $(CONTENT) Info.plist
 	rm -rf $(NAME).app
@@ -129,12 +135,10 @@ $(NAME)-linux-$(VERSION).AppImage: $(NAME)-linux-$(VERSION).AppDir
 	ARCH=x86_64 appimagetool $< $@
 
 clean:
-	rm -rf $(BUILDDIR)
+	$(RM) -rf $(BUILDDIR)
 
 distclean: clean
 	rm -rf *.app *.dmg *.zip
 	rm -rf *.AppDir *.AppImage
 	rm -rf *.html *.js *.data *.wasm
 	rm -rf *-web-*/ *output/
-
-.PHONY: all echo clean distclean run package wasm web backdrops
