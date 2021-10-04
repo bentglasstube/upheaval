@@ -10,3 +10,6 @@ bazel-*
 /*.wasm
 /*-web-*/
 *output/
+content/story.png
+content/title.png
+content/winner.png
